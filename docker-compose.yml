@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   api:
     build: .
@@ -17,7 +16,8 @@ services:
       /bin/sh -c "
       echo 'Waiting for Postgres to be ready...' &&
       sleep 5 &&
-      echo 'Creating database (if not exists)...' &&
+      echo 'Reset database...' &&
+      sqlx database drop &&
       sqlx database create &&
       echo 'Running migrations...' &&
       sqlx migrate run &&
@@ -33,7 +33,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_PASSWORD: "1234"
       POSTGRES_DB: dwarf-rs
     ports:
       - "5432:5432"
