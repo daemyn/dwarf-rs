@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS dwarf_urls (
     id SERIAL PRIMARY KEY,
-    slug TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
     target TEXT NOT NULL,
     visit_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),

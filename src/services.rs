@@ -25,22 +25,40 @@ pub async fn generate_url(
     target: &str,
     slug_size: u8,
 ) -> Result<DwarfUrl, Error> {
-    let now = Utc::now();
-    let slug = generate_slug(slug_size);
+    // Recursive fn is an option here but it requires Pin and make the code hard to read
+    loop {
+        let now = Utc::now();
+        let slug = generate_slug(slug_size);
 
-    let dwarf_url = sqlx::query_as!(
-        DwarfUrl,
-        r#"
-        INSERT INTO dwarf_urls (slug, target, visit_count, created_at, updated_at)
-        VALUES ($1, $2, 0, $3, $3)
-        RETURNING *
-        "#,
-        slug,
-        target,
-        now,
-    )
-    .fetch_one(pool)
-    .await?;
+        let count: i64 = sqlx::query_scalar(
+            r#"
+            SELECT COUNT(*) 
+            FROM dwarf_urls 
+            WHERE slug = $1
+            "#,
+        )
+        .bind(&slug)
+        .fetch_one(pool)
+        .await?;
 
-    Ok(dwarf_url)
+        if count > 0 {
+            continue;
+        }
+
+        let dwarf_url = sqlx::query_as!(
+            DwarfUrl,
+            r#"
+            INSERT INTO dwarf_urls (slug, target, visit_count, created_at, updated_at)
+            VALUES ($1, $2, 0, $3, $3)
+            RETURNING *
+            "#,
+            slug,
+            target,
+            now,
+        )
+        .fetch_one(pool)
+        .await?;
+
+        return Ok(dwarf_url);
+    }
 }
