@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    container_name: dwarf_rs
+    environment:
+      RUST_LOG: debug
+      APP_PORT: 3000
+      DATABASE_URL: postgresql://postgres:1234@postgres/dwarf-rs?connect_timeout=5
+      SLUG_SIZE: 6
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    # Override the default CMD in the Dockerfile
+    command: >
+      /bin/sh -c "
+      echo 'Waiting for Postgres to be ready...' &&
+      sleep 5 &&
+      echo 'Creating database (if not exists)...' &&
+      sqlx database create &&
+      echo 'Running migrations...' &&
+      sqlx migrate run &&
+      echo 'Starting dwarf-rs...' &&
+      dwarf-rs
+      "
+    networks:
+      - dwarf_net
+
+  postgres:
+    image: postgres:latest
+    container_name: dwarf_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: dwarf-rs
+    ports:
+      - "5432:5432"
+    networks:
+      - dwarf_net
+
+networks:
+  dwarf_net:
+    driver: bridge
