@@ -2,9 +2,9 @@
   <img src="dwarf-rs.png" alt="Logo" style="width:25%;"/>
 </p>
 
-# Dwarf-URL
+# dwarf-rs
 
-Dwarf-URL is a lightweight and efficient open-source URL shortener written in Rust, leveraging the Actix-Web framework and PostgreSQL for persistence. Its primary focus is on simplicity, scalability, and performance, making it a great choice for personal or small-scale URL shortening services.
+dwarf-rs is a lightweight and efficient open-source URL shortener written in Rust, leveraging the Actix-Web framework and PostgreSQL for persistence. Its primary focus is on simplicity, scalability, and performance, making it a great choice for personal or small-scale URL shortening services.
 
 ## Features
 - Shorten long URLs with customizable slug size.
@@ -28,7 +28,7 @@ Dwarf-URL is a lightweight and efficient open-source URL shortener written in Ru
 ## Getting Started
 
 ### Prerequisites
-To run Dwarf-URL, you need:
+To run dwarf-rs, you need:
 - [Rust](https://www.rust-lang.org/) (1.82 or higher recommended)
 - [PostgreSQL](https://www.postgresql.org/) (16 or higher recommended)
 - [Docker](https://www.docker.com/) (optional, for containerized deployment)
@@ -36,8 +36,8 @@ To run Dwarf-URL, you need:
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/dwarf-url.git
-   cd dwarf-url
+   git clone https://github.com/daemyn/dwarf-rs.git
+   cd dwarf-rs
    ```
 
 2. Create the `.env` file based on `.env.example`:
@@ -143,7 +143,7 @@ Contributions are welcome! To contribute:
 
 ## TODO
 
-This section outlines tasks and enhancements to improve the Dwarf-URL project. The checklist is divided into categories for better organization.
+This section outlines tasks and enhancements to improve the dwarf-rs project. The checklist is divided into categories for better organization.
 
 ### Features
 - [x] **Validate URL inputs**: Ensure that the `target` field in the payload contains a valid URL.
@@ -157,7 +157,7 @@ This section outlines tasks and enhancements to improve the Dwarf-URL project. T
 - [ ] **Graceful shutdown**: Handle termination signals (e.g., `SIGTERM`) to ensure resources like database connections are cleaned up properly.
 - [ ] **API versioning**: Introduce API versioning to maintain backward compatibility for future updates.
 
-This checklist serves as a roadmap for enhancing the reliability, performance, and usability of the Dwarf-URL project.
+This checklist serves as a roadmap for enhancing the reliability, performance, and usability of the dwarf-rs project.
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
