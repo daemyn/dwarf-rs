@@ -1,7 +1,9 @@
 use chrono::Utc;
 use sqlx::{Error, Pool, Postgres};
-
+use log::{error, warn};
 use crate::{models::DwarfUrl, utils::generate_slug};
+
+const MAX_ATTEMPTS: u8 = 10;
 
 pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, Error> {
     let dwarf_url = sqlx::query_as!(
@@ -25,27 +27,19 @@ pub async fn generate_url(
     target: &str,
     slug_size: u8,
 ) -> Result<DwarfUrl, Error> {
-    // Recursive fn is an option here but it requires Pin and make the code hard to read
+    let mut attempts: u8 = 0;
     loop {
+        attempts += 1;
+
+        if attempts > MAX_ATTEMPTS {
+            error!( "Max attempts reached while generating URL. Attempts: {}", attempts);
+            return Err(Error::RowNotFound);
+        }
+
         let now = Utc::now();
         let slug = generate_slug(slug_size);
 
-        let count: i64 = sqlx::query_scalar(
-            r#"
-            SELECT COUNT(*) 
-            FROM dwarf_urls 
-            WHERE slug = $1
-            "#,
-        )
-        .bind(&slug)
-        .fetch_one(pool)
-        .await?;
-
-        if count > 0 {
-            continue;
-        }
-
-        let dwarf_url = sqlx::query_as!(
+        match sqlx::query_as!(
             DwarfUrl,
             r#"
             INSERT INTO dwarf_urls (slug, target, visit_count, created_at, updated_at)
@@ -57,8 +51,21 @@ pub async fn generate_url(
             now,
         )
         .fetch_one(pool)
-        .await?;
-
-        return Ok(dwarf_url);
+        .await
+        {
+            Ok(dwarf_url) => {
+                return Ok(dwarf_url);
+            }
+            Err(sqlx::Error::Database(err)) if err.code().unwrap_or_default() == "23505" => {
+                warn!(
+                    "Slug collision detected for: '{}'. Retrying... Attempt: {}",
+                    slug, attempts
+                );
+                continue;
+            }
+            Err(err) => {
+                return Err(err);
+            }
+        }
     }
 }
