@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="dwarf-rs.png" alt="Logo" style="width:25%;"/>
+</p>
+
 # Dwarf-URL
 
 Dwarf-URL is a lightweight and efficient open-source URL shortener written in Rust, leveraging the Actix-Web framework and PostgreSQL for persistence. Its primary focus is on simplicity, scalability, and performance, making it a great choice for personal or small-scale URL shortening services.
