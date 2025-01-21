@@ -7,6 +7,7 @@ use actix_web::{
     web::{Data, Json, Path},
     HttpResponse, Responder,
 };
+use url::Url;
 
 pub async fn get_dwarf_url_by_slug(
     state: Data<AppState>,
@@ -26,6 +27,10 @@ pub async fn create_dwarf_url(
     payload: Result<Json<CreateDwarfUrl>, actix_web::Error>,
 ) -> Result<impl Responder, AppError> {
     let body = payload.map_err(|_| AppError::BadClientData("Invalid request body".to_string()))?;
+
+    if Url::parse(&body.target).is_err() {
+        return Err(AppError::BadClientData("Invalid URL provided in target field".to_string()));
+    }
 
     let dwarf_url = generate_url(&state.pool, &body.target, state.slug_size)
         .await
