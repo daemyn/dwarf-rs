@@ -142,10 +142,8 @@ Contributions are welcome! To contribute:
 This section outlines tasks and enhancements to improve the Dwarf-URL project. The checklist is divided into categories for better organization.
 
 ### Features
-- [ ] **Validate URL inputs**: Ensure that the `target` field in the payload contains a valid URL.
-- [ ] **Rate limiting**: Implement request rate limiting to prevent abuse of the URL creation API.
-- [ ] **Customizable slugs**: Add support for user-defined slugs or advanced slug generation.
-- [ ] **Enhanced analytics**: Track additional metadata such as the last accessed timestamp, user-agent, or referrer for each URL.
+- [x] **Validate URL inputs**: Ensure that the `target` field in the payload contains a valid URL.
+- [x] **Rate limiting**: Implement request rate limiting to prevent abuse of the URL creation API.
 
 ### Testing
 - [ ] **Integration tests**: Write tests for all API endpoints using Actix's testing utilities.
