@@ -107,7 +107,7 @@ RUST_LOG=debug
   ```
 
 #### Retrieve a URL by Slug
-- **GET** `/{slug}`
+- **GET** `/{slug}/details`
 
   **Response:**
   ```json
@@ -120,6 +120,12 @@ RUST_LOG=debug
     "updated_at": "2025-01-21T00:00:00Z"
   }
   ```
+
+  #### Retrieve a URL by Slug
+- **GET** `/{slug}`
+
+  **Response:**
+ Redirect to `target` url
 
 ## Project Structure
 
