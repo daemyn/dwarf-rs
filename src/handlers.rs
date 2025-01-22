@@ -22,6 +22,21 @@ pub async fn get_dwarf_url_by_slug(
     Ok(HttpResponse::Ok().json(dwarf_url))
 }
 
+pub async fn redirect_dwarf_url_by_slug(
+    state: Data<AppState>,
+    path: Path<String>,
+) -> Result<impl Responder, AppError> {
+    let slug = path.into_inner();
+
+    let dwarf_url = visit_url(&state.pool, &slug)
+        .await
+        .map_err(|_| AppError::NotFound)?;
+
+    Ok(HttpResponse::MovedPermanently()
+        .append_header(("Location", dwarf_url.target))
+        .finish())
+}
+
 pub async fn create_dwarf_url(
     state: Data<AppState>,
     payload: Result<Json<CreateDwarfUrl>, actix_web::Error>,
