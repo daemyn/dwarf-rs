@@ -24,7 +24,7 @@ pub struct DwarfUrl {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct CreateDwarfUrl {
     pub target: String,
 }
