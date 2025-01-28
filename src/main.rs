@@ -2,7 +2,7 @@ use std::time::Duration;
 use actix_extensible_rate_limit::{backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder}, RateLimiter};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dwarf_rs::{
-    handlers::{create_dwarf_url, get_dwarf_url_by_slug, redirect_dwarf_url_by_slug},
+    handlers::{create_dwarf_url, get_dwarf_url_by_slug, health_check, redirect_dwarf_url_by_slug},
     models::AppState,
     utils::load_app_env,
 };
@@ -40,6 +40,7 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(web::Data::new(app_state.clone()))
+            .route("/health", web::get().to(health_check))
             .route("/{slug}/details", web::get().to(get_dwarf_url_by_slug))
             .route("/{slug}", web::get().to(redirect_dwarf_url_by_slug))
             .route("/", web::post().to(create_dwarf_url))

@@ -9,6 +9,10 @@ use actix_web::{
 };
 use url::Url;
 
+pub async fn health_check() -> Result<impl Responder, AppError> {
+    Ok(HttpResponse::Ok().body("ok"))
+}
+
 pub async fn get_dwarf_url_by_slug(
     state: Data<AppState>,
     path: Path<String>,
