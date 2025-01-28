@@ -4,6 +4,7 @@ use log::{error, warn};
 use crate::{models::DwarfUrl, utils::generate_slug};
 
 const MAX_ATTEMPTS: u8 = 10;
+const BLACK_LIST_WORDS: [&str; 1] = ["health"];
 
 pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, Error> {
     let dwarf_url = sqlx::query_as!(
@@ -38,6 +39,10 @@ pub async fn generate_url(
 
         let now = Utc::now();
         let slug = generate_slug(slug_size);
+
+        if BLACK_LIST_WORDS.contains(&slug.as_str()) {
+            continue;
+        }
 
         match sqlx::query_as!(
             DwarfUrl,
