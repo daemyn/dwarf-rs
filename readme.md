@@ -67,6 +67,12 @@ To run dwarf-rs, you need:
    cargo build
    ```
 
+   Build in offline mode:
+
+   ```bash
+   SQLX_OFFLINE=true cargo build
+   ```
+
 6. Run the server:
    ```bash
    cargo run
