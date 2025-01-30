@@ -20,3 +20,7 @@ url = "2.5.4"
 
 [dev-dependencies]
 uuid = { version = "1.12.1", features = [ "v4", "fast-rng", "macro-diagnostics"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
