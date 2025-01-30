@@ -87,6 +87,8 @@ APP_PORT=3000
 DATABASE_URL=postgresql://<username>:<password>@<host>/<database>
 SLUG_SIZE=6
 RUST_LOG=debug
+RATE_LIMIT=10
+RATE_LIMIT_INTERVAL=60
 ```
 
 | Variable              | Description                                                     | Default    |
