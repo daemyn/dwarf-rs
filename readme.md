@@ -102,7 +102,7 @@ RUST_LOG=debug
 
 #### Create a Short URL
 
-- **POST** `/`
+- **POST** `/api/v0/urls`
 
   **Request Body:**
 
@@ -127,7 +127,7 @@ RUST_LOG=debug
 
 #### Retrieve a URL by Slug
 
-- **GET** `/{slug}/details`
+- **GET** `/api/v0/urls/{slug}`
 
   **Response:**
 
@@ -148,6 +148,12 @@ RUST_LOG=debug
 
   **Response:**
   Redirect to `target` url
+
+- **GET** `/health`
+
+  **Response:**
+  - status code `200` when `ok`
+  - status code `503` when `service unavailable`
 
 ## Project Structure
 
