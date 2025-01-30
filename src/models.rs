@@ -6,6 +6,8 @@ pub struct AppEnv {
     pub db_url: String,
     pub app_port: u16,
     pub slug_size: u8,
+    pub rate_limit: u64,
+    pub rate_limit_interval: u64,
 }
 
 #[derive(Clone)]
