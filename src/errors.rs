@@ -16,6 +16,9 @@ pub enum AppError {
 
     #[display("Not found")]
     NotFound,
+
+    #[display("Max attempts reached")]
+    MaxAttemptsReached,
 }
 
 impl error::ResponseError for AppError {
@@ -24,6 +27,7 @@ impl error::ResponseError for AppError {
             AppError::InternalError => "Internal error occurred",
             AppError::BadClientData(msg) => msg,
             AppError::NotFound => "Resource not found",
+            AppError::MaxAttemptsReached => "Max attempts reached",
         };
 
         HttpResponse::build(self.status_code())
@@ -39,6 +43,7 @@ impl error::ResponseError for AppError {
             AppError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::BadClientData(_) => StatusCode::BAD_REQUEST,
             AppError::NotFound => StatusCode::NOT_FOUND,
+            AppError::MaxAttemptsReached => StatusCode::UNPROCESSABLE_ENTITY,
         }
     }
 }

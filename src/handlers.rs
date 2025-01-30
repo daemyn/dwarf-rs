@@ -19,9 +19,7 @@ pub async fn get_dwarf_url_by_slug(
 ) -> Result<impl Responder, AppError> {
     let slug = path.into_inner();
 
-    let dwarf_url = visit_url(&state.pool, &slug)
-        .await
-        .map_err(|_| AppError::NotFound)?;
+    let dwarf_url = visit_url(&state.pool, &slug).await?;
 
     Ok(HttpResponse::Ok().json(dwarf_url))
 }
@@ -32,9 +30,7 @@ pub async fn redirect_dwarf_url_by_slug(
 ) -> Result<impl Responder, AppError> {
     let slug = path.into_inner();
 
-    let dwarf_url = visit_url(&state.pool, &slug)
-        .await
-        .map_err(|_| AppError::NotFound)?;
+    let dwarf_url = visit_url(&state.pool, &slug).await?;
 
     Ok(HttpResponse::MovedPermanently()
         .append_header(("Location", dwarf_url.target))
@@ -48,12 +44,12 @@ pub async fn create_dwarf_url(
     let body = payload.map_err(|_| AppError::BadClientData("Invalid request body".to_string()))?;
 
     if Url::parse(&body.target).is_err() {
-        return Err(AppError::BadClientData("Invalid URL provided in target field".to_string()));
+        return Err(AppError::BadClientData(
+            "Invalid URL provided in target field".to_string(),
+        ));
     }
 
-    let dwarf_url = generate_url(&state.pool, &body.target, state.slug_size)
-        .await
-        .map_err(|_| AppError::InternalError)?;
+    let dwarf_url = generate_url(&state.pool, &body.target, state.slug_size).await?;
 
     Ok(HttpResponse::Created().json(dwarf_url))
 }

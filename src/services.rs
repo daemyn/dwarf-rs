@@ -1,13 +1,13 @@
+use crate::{errors::AppError, models::DwarfUrl, utils::generate_slug};
 use chrono::Utc;
-use sqlx::{Error, Pool, Postgres};
 use log::{error, warn};
-use crate::{models::DwarfUrl, utils::generate_slug};
+use sqlx::{Pool, Postgres};
 
 const MAX_ATTEMPTS: u8 = 10;
 const BLACK_LIST_WORDS: [&str; 1] = ["health"];
 
-pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, Error> {
-    let dwarf_url = sqlx::query_as!(
+pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, AppError> {
+    match sqlx::query_as!(
         DwarfUrl,
         r#"
         UPDATE dwarf_urls
@@ -18,23 +18,29 @@ pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, Er
         slug
     )
     .fetch_one(pool)
-    .await?;
-
-    Ok(dwarf_url)
+    .await
+    {
+        Ok(dwarf_url) => return Ok(dwarf_url),
+        Err(sqlx::Error::RowNotFound) => return Err(AppError::NotFound),
+        Err(_) => return Err(AppError::InternalError),
+    }
 }
 
 pub async fn generate_url(
     pool: &Pool<Postgres>,
     target: &str,
     slug_size: u8,
-) -> Result<DwarfUrl, Error> {
+) -> Result<DwarfUrl, AppError> {
     let mut attempts: u8 = 0;
     loop {
         attempts += 1;
 
         if attempts > MAX_ATTEMPTS {
-            error!( "Max attempts reached while generating URL. Attempts: {}", attempts);
-            return Err(Error::RowNotFound);
+            error!(
+                "Max attempts reached while generating URL. Attempts: {}",
+                attempts
+            );
+            return Err(AppError::MaxAttemptsReached);
         }
 
         let now = Utc::now();
@@ -58,9 +64,7 @@ pub async fn generate_url(
         .fetch_one(pool)
         .await
         {
-            Ok(dwarf_url) => {
-                return Ok(dwarf_url);
-            }
+            Ok(dwarf_url) => return Ok(dwarf_url),
             Err(sqlx::Error::Database(err)) if err.code().unwrap_or_default() == "23505" => {
                 warn!(
                     "Slug collision detected for: '{}'. Retrying... Attempt: {}",
@@ -68,9 +72,7 @@ pub async fn generate_url(
                 );
                 continue;
             }
-            Err(err) => {
-                return Err(err);
-            }
+            Err(_) => return Err(AppError::InternalError),
         }
     }
 }
