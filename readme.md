@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="dwarf-rs.png" alt="Logo" style="width:25%;"/>
+  <img src="dwarf-rs.png" alt="Logo" style="width:32%;"/>
 </p>
 
 # dwarf-rs
@@ -89,12 +89,14 @@ SLUG_SIZE=6
 RUST_LOG=debug
 ```
 
-| Variable       | Description                                     |
-| -------------- | ----------------------------------------------- |
-| `APP_PORT`     | Port on which the server will run.              |
-| `DATABASE_URL` | Connection URL for PostgreSQL.                  |
-| `SLUG_SIZE`    | Number of characters in the generated slugs.    |
-| `RUST_LOG`     | Logging level (e.g., `debug`, `info`, `error`). |
+| Variable              | Description                                                     | Default    |
+| --------------------- | --------------------------------------------------------------- | ---------- |
+| `APP_PORT`            | Port on which the server will run.                              | `3000`     |
+| `DATABASE_URL`        | Connection URL for PostgreSQL.                                  | `required` |
+| `SLUG_SIZE`           | Number of characters in the generated slugs.                    | `6`        |
+| `RUST_LOG`            | Logging level (e.g., `debug`, `info`, `error`).                 | `debug`    |
+| `RATE_LIMIT`          | Maximum number of requests allowed within a given time interval | `10`       |
+| `RATE_LIMIT_INTERVAL` | Duration of the time interval (in seconds) for rate limiting    | `60`       |
 
 ## Usage
 
