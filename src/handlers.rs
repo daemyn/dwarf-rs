@@ -1,7 +1,7 @@
 use crate::{
     errors::AppError,
     models::{AppState, CreateDwarfUrl},
-    services::{generate_url, service_health_check, visit_url},
+    services::{generate_url, get_url_by_slug, service_health_check, visit_url},
 };
 use actix_web::{
     web::{Data, Json, Path},
@@ -21,7 +21,7 @@ pub async fn get_dwarf_url_by_slug(
 ) -> Result<impl Responder, AppError> {
     let slug = path.into_inner();
 
-    let dwarf_url = visit_url(&state.pool, &slug).await?;
+    let dwarf_url = get_url_by_slug(&state.pool, &slug).await?;
 
     Ok(HttpResponse::Ok().json(dwarf_url))
 }

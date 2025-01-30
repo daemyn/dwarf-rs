@@ -13,6 +13,24 @@ pub async fn service_health_check(pool: &Pool<Postgres>) -> Result<(), AppError>
     }
 }
 
+pub async fn get_url_by_slug(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, AppError> {
+    match sqlx::query_as!(
+        DwarfUrl,
+        r#"
+        SELECT * FROM dwarf_urls
+        WHERE slug = $1
+        "#,
+        slug
+    )
+    .fetch_one(pool)
+    .await
+    {
+        Ok(dwarf_url) => Ok(dwarf_url),
+        Err(sqlx::Error::RowNotFound) => Err(AppError::NotFound),
+        Err(_) => Err(AppError::InternalError),
+    }
+}
+
 pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, AppError> {
     match sqlx::query_as!(
         DwarfUrl,
