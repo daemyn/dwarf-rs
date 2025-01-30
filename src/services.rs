@@ -6,6 +6,13 @@ use sqlx::{Pool, Postgres};
 const MAX_ATTEMPTS: u8 = 10;
 const BLACK_LIST_WORDS: [&str; 1] = ["health"];
 
+pub async fn service_health_check(pool: &Pool<Postgres>) -> Result<(), AppError> {
+    match sqlx::query_scalar!("SELECT 1").fetch_one(pool).await {
+        Ok(_) => Ok(()),
+        Err(_) => Err(AppError::ServiceUnavailable),
+    }
+}
+
 pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, AppError> {
     match sqlx::query_as!(
         DwarfUrl,
@@ -20,9 +27,9 @@ pub async fn visit_url(pool: &Pool<Postgres>, slug: &str) -> Result<DwarfUrl, Ap
     .fetch_one(pool)
     .await
     {
-        Ok(dwarf_url) => return Ok(dwarf_url),
-        Err(sqlx::Error::RowNotFound) => return Err(AppError::NotFound),
-        Err(_) => return Err(AppError::InternalError),
+        Ok(dwarf_url) => Ok(dwarf_url),
+        Err(sqlx::Error::RowNotFound) => Err(AppError::NotFound),
+        Err(_) => Err(AppError::InternalError),
     }
 }
 

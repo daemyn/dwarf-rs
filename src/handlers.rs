@@ -1,7 +1,7 @@
 use crate::{
     errors::AppError,
     models::{AppState, CreateDwarfUrl},
-    services::{generate_url, visit_url},
+    services::{generate_url, service_health_check, visit_url},
 };
 use actix_web::{
     web::{Data, Json, Path},
@@ -9,8 +9,10 @@ use actix_web::{
 };
 use url::Url;
 
-pub async fn health_check() -> Result<impl Responder, AppError> {
-    Ok(HttpResponse::Ok().body("ok"))
+
+pub async fn health_check(state: Data<AppState>) -> Result<impl Responder, AppError> {
+    service_health_check(&state.pool).await?;
+    Ok(HttpResponse::Ok())
 }
 
 pub async fn get_dwarf_url_by_slug(

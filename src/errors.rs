@@ -11,6 +11,9 @@ pub enum AppError {
     #[display("Internal error")]
     InternalError,
 
+    #[display("Service unavailable")]
+    ServiceUnavailable,
+
     #[display("Bad request")]
     BadClientData(String),
 
@@ -28,6 +31,7 @@ impl error::ResponseError for AppError {
             AppError::BadClientData(msg) => msg,
             AppError::NotFound => "Resource not found",
             AppError::MaxAttemptsReached => "Max attempts reached",
+            AppError::ServiceUnavailable => "Service unavailable",
         };
 
         HttpResponse::build(self.status_code())
@@ -44,6 +48,7 @@ impl error::ResponseError for AppError {
             AppError::BadClientData(_) => StatusCode::BAD_REQUEST,
             AppError::NotFound => StatusCode::NOT_FOUND,
             AppError::MaxAttemptsReached => StatusCode::UNPROCESSABLE_ENTITY,
+            AppError::ServiceUnavailable => StatusCode::SERVICE_UNAVAILABLE,
         }
     }
 }
