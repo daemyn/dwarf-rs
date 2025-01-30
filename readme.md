@@ -178,26 +178,6 @@ Contributions are welcome! To contribute:
 4. Push to the branch (`git push origin feature-branch`).
 5. Open a pull request.
 
-## TODO
-
-This section outlines tasks and enhancements to improve the dwarf-rs project. The checklist is divided into categories for better organization.
-
-### Features
-
-- [x] **Validate URL inputs**: Ensure that the `target` field in the payload contains a valid URL.
-- [x] **Rate limiting**: Implement request rate limiting to prevent abuse of the URL creation API.
-
-### Testing
-
-- [ ] **Integration tests**: Write tests for all API endpoints using Actix's testing utilities.
-
-### Miscellaneous
-
-- [ ] **Graceful shutdown**: Handle termination signals (e.g., `SIGTERM`) to ensure resources like database connections are cleaned up properly.
-- [ ] **API versioning**: Introduce API versioning to maintain backward compatibility for future updates.
-
-This checklist serves as a roadmap for enhancing the reliability, performance, and usability of the dwarf-rs project.
-
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
