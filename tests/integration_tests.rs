@@ -4,8 +4,9 @@ use actix_web::{http::StatusCode, test, web, App};
 use dwarf_rs::{
     handlers::{create_dwarf_url, get_dwarf_url_by_slug, redirect_dwarf_url_by_slug},
     models::{AppState, CreateDwarfUrl},
-    services::generate_url,
+    services::{generate_url, get_url_by_slug},
 };
+use serde_json::json;
 
 use crate::helpers::test_database::TestDatabase;
 
@@ -21,16 +22,40 @@ async fn test_create_dwarf_url() {
     let mut app = test::init_service(
         App::new()
             .app_data(web::Data::new(app_state))
-            .route("/", web::post().to(create_dwarf_url)),
+            .route("/api/v0/urls", web::post().to(create_dwarf_url)),
     )
     .await;
+
+    let req = test::TestRequest::post()
+        .uri("/api/v0/urls")
+        .set_json(json!({
+            "notarget": "url value"
+        }))
+        .to_request();
+
+    let resp = test::call_service(&mut app, req).await;
+
+    assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+
+    let payload = CreateDwarfUrl {
+        target: "no_url".to_string(),
+    };
+
+    let req = test::TestRequest::post()
+        .uri("/api/v0/urls")
+        .set_json(&payload)
+        .to_request();
+
+    let resp = test::call_service(&mut app, req).await;
+
+    assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
 
     let payload = CreateDwarfUrl {
         target: "https://example.com".to_string(),
     };
 
     let req = test::TestRequest::post()
-        .uri("/")
+        .uri("/api/v0/urls")
         .set_json(&payload)
         .to_request();
 
@@ -63,12 +88,12 @@ async fn test_get_dwarf_url_by_slug() {
     let mut app = test::init_service(
         App::new()
             .app_data(web::Data::new(app_state))
-            .route("/{slug}/details", web::get().to(get_dwarf_url_by_slug)),
+            .route("/api/v0/urls/{slug}", web::get().to(get_dwarf_url_by_slug)),
     )
     .await;
 
     let req = test::TestRequest::get()
-        .uri(&format!("/{}/details", created_url.slug))
+        .uri(&format!("/api/v0/urls/{}", created_url.slug))
         .to_request();
 
     let resp = test::call_service(&mut app, req).await;
@@ -78,6 +103,15 @@ async fn test_get_dwarf_url_by_slug() {
     let body: serde_json::Value = test::read_body_json(resp).await;
     assert_eq!(body["slug"], created_url.slug);
     assert_eq!(body["target"], "https://example.com");
+    assert_eq!(body["visit_count"], 0);
+
+    let req = test::TestRequest::get()
+        .uri(&format!("/api/v0/urls/{}x", created_url.slug))
+        .to_request();
+
+    let resp = test::call_service(&mut app, req).await;
+
+    assert_eq!(resp.status(), StatusCode::NOT_FOUND);
 }
 
 #[actix_web::test]
@@ -109,4 +143,10 @@ async fn test_redirect_dwarf_url_by_slug() {
 
     let location_header = resp.headers().get("Location").unwrap();
     assert_eq!(location_header, "https://example.com");
+
+    let visited_url = get_url_by_slug(&test_db.pool, &created_url.slug)
+        .await
+        .expect("Failed to get URL");
+
+    assert_eq!(visited_url.visit_count, 1);
 }
