@@ -1,6 +1,5 @@
 use dotenvy::dotenv;
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
+use rand::{distr::Alphanumeric, rng, Rng};
 
 use crate::models::AppEnv;
 
@@ -10,7 +9,7 @@ const RATE_LIMIT: u64 = 10;
 const RATE_LIMIT_INTERVAL: u64 = 60;
 
 pub fn generate_slug(length: u8) -> String {
-    thread_rng()
+    rng()
         .sample_iter(&Alphanumeric)
         .take(length as usize)
         .map(char::from)
@@ -48,6 +47,6 @@ pub fn load_app_env() -> AppEnv {
         db_url,
         slug_size,
         rate_limit,
-        rate_limit_interval
+        rate_limit_interval,
     }
 }

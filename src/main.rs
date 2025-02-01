@@ -1,5 +1,7 @@
-use std::time::Duration;
-use actix_extensible_rate_limit::{backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder}, RateLimiter};
+use actix_extensible_rate_limit::{
+    backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder},
+    RateLimiter,
+};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dwarf_rs::{
     handlers::{create_dwarf_url, get_dwarf_url_by_slug, health_check, redirect_dwarf_url_by_slug},
@@ -8,6 +10,7 @@ use dwarf_rs::{
 };
 use env_logger::Env;
 use sqlx::postgres::PgPoolOptions;
+use std::time::Duration;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -28,9 +31,12 @@ async fn main() -> std::io::Result<()> {
     let backend = InMemoryBackend::builder().build();
 
     HttpServer::new(move || {
-        let input = SimpleInputFunctionBuilder::new(Duration::from_secs(env.rate_limit_interval), env.rate_limit)
-            .real_ip_key()
-            .build();
+        let input = SimpleInputFunctionBuilder::new(
+            Duration::from_secs(env.rate_limit_interval),
+            env.rate_limit,
+        )
+        .real_ip_key()
+        .build();
         let rate_limiter = RateLimiter::builder(backend.clone(), input)
             .add_headers()
             .build();
