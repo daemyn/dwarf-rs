@@ -10,7 +10,6 @@ use serde_json::json;
 
 use crate::helpers::test_database::TestDatabase;
 
-
 #[actix_web::test]
 async fn test_create_dwarf_url() {
     let test_db = TestDatabase::new().await;
@@ -19,7 +18,7 @@ async fn test_create_dwarf_url() {
         slug_size: 6,
     };
 
-    let mut app = test::init_service(
+    let app = test::init_service(
         App::new()
             .app_data(web::Data::new(app_state))
             .route("/api/v0/urls", web::post().to(create_dwarf_url)),
@@ -33,7 +32,7 @@ async fn test_create_dwarf_url() {
         }))
         .to_request();
 
-    let resp = test::call_service(&mut app, req).await;
+    let resp = test::call_service(&app, req).await;
 
     assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
 
@@ -46,7 +45,7 @@ async fn test_create_dwarf_url() {
         .set_json(&payload)
         .to_request();
 
-    let resp = test::call_service(&mut app, req).await;
+    let resp = test::call_service(&app, req).await;
 
     assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
 
@@ -59,22 +58,21 @@ async fn test_create_dwarf_url() {
         .set_json(&payload)
         .to_request();
 
-    let resp = test::call_service(&mut app, req).await;
+    let resp = test::call_service(&app, req).await;
 
     assert_eq!(resp.status(), StatusCode::CREATED);
 
     let body: serde_json::Value = test::read_body_json(resp).await;
     let slug = body
-                        .get("slug")
-                        .expect("Missing 'slug' field")
-                        .as_str()
-                        .expect("'slug' is not a string");
+        .get("slug")
+        .expect("Missing 'slug' field")
+        .as_str()
+        .expect("'slug' is not a string");
     assert_eq!(slug.len(), 6, "Slug length is not 6");
 }
 
 #[actix_web::test]
 async fn test_get_dwarf_url_by_slug() {
-
     let test_db = TestDatabase::new().await;
     let app_state = AppState {
         pool: test_db.pool.clone(),
@@ -85,7 +83,7 @@ async fn test_get_dwarf_url_by_slug() {
         .await
         .expect("Failed to generate URL");
 
-    let mut app = test::init_service(
+    let app = test::init_service(
         App::new()
             .app_data(web::Data::new(app_state))
             .route("/api/v0/urls/{slug}", web::get().to(get_dwarf_url_by_slug)),
@@ -96,7 +94,7 @@ async fn test_get_dwarf_url_by_slug() {
         .uri(&format!("/api/v0/urls/{}", created_url.slug))
         .to_request();
 
-    let resp = test::call_service(&mut app, req).await;
+    let resp = test::call_service(&app, req).await;
 
     assert_eq!(resp.status(), StatusCode::OK);
 
@@ -109,7 +107,7 @@ async fn test_get_dwarf_url_by_slug() {
         .uri(&format!("/api/v0/urls/{}x", created_url.slug))
         .to_request();
 
-    let resp = test::call_service(&mut app, req).await;
+    let resp = test::call_service(&app, req).await;
 
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
 }
@@ -126,7 +124,7 @@ async fn test_redirect_dwarf_url_by_slug() {
         .await
         .expect("Failed to generate URL");
 
-    let mut app = test::init_service(
+    let app = test::init_service(
         App::new()
             .app_data(web::Data::new(app_state))
             .route("/{slug}", web::get().to(redirect_dwarf_url_by_slug)),
@@ -137,7 +135,7 @@ async fn test_redirect_dwarf_url_by_slug() {
         .uri(&format!("/{}", created_url.slug))
         .to_request();
 
-    let resp = test::call_service(&mut app, req).await;
+    let resp = test::call_service(&app, req).await;
 
     assert_eq!(resp.status(), StatusCode::MOVED_PERMANENTLY);
 

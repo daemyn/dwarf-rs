@@ -9,7 +9,6 @@ use actix_web::{
 };
 use url::Url;
 
-
 pub async fn health_check(state: Data<AppState>) -> Result<impl Responder, AppError> {
     service_health_check(&state.pool).await?;
     Ok(HttpResponse::Ok())
