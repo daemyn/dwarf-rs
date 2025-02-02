@@ -18,7 +18,7 @@ pub struct AppState {
 
 #[derive(Clone, Debug, FromRow, Serialize, Deserialize)]
 pub struct DwarfUrl {
-    pub id: Option<i32>,
+    pub id: i32,
     pub slug: String,
     pub target: String,
     pub visit_count: i32,
